@@ -9,9 +9,9 @@ import folderIcon from "./icons/icon-folder.png";
 const NodeElem = styled.div`
 	display: block;
 	color: white;
-	padding: 1px;
+	margin: 8px;
 	text-align: left;
-	margin-left: 20px;
+	margin-left: 10px;
 `;
 
 const Arrow = styled.img`
@@ -19,14 +19,14 @@ const Arrow = styled.img`
 	position: absolute;
 `;
 const Delete = styled.img`
-	position: relative;
+	position: absolute;
 	width: 20px;
-	top: 3px;
 `;
 
 const TypeIcon = styled.img`
 	position: absolute;
 	margin-left: 2vw;
+	width: 18px;
 `;
 
 const Title = styled.span`
@@ -39,12 +39,11 @@ const TitleEdit = styled.input`
 	margin-left: 4vw;
 `;
 
-const renderChildren = (children, currentDepth, deleteNode, renameNode) => {
+const renderChildren = (children, deleteNode, renameNode) => {
 	return children.map((node, index) => (
 		<Node
 			key={index}
 			info={node}
-			depth={currentDepth + 1}
 			deleteNode={deleteNode}
 			renameNode={renameNode}
 		></Node>
@@ -53,7 +52,6 @@ const renderChildren = (children, currentDepth, deleteNode, renameNode) => {
 
 const Node = ({
 	info: { name, type, parent, id, children },
-	depth,
 	deleteNode,
 	renameNode,
 }) => {
@@ -66,35 +64,29 @@ const Node = ({
 	};
 
 	return (
-		<div>
-			<NodeElem>
-				{children &&
-					children.length > 0 &&
-					(open ? (
-						<Arrow src={arrowOpen} onClick={() => setOpen(!open)} />
-					) : (
-						<Arrow
-							src={arrowClosed}
-							onClick={() => setOpen(!open)}
-						/>
-					))}
-				{type === "folder" ? (
-					<TypeIcon src={folderIcon} />
+		<NodeElem>
+			{children.length > 0 &&
+				(open ? (
+					<Arrow src={arrowOpen} onClick={() => setOpen(!open)} />
 				) : (
-					<TypeIcon src={fileIcon} />
-				)}
-				{editMode ? (
-					<TitleEdit onBlur={rename} defaultValue={name}></TitleEdit>
-				) : (
-					<Title onClick={() => setEditMode(!editMode)}>{name}</Title>
-				)}
+					<Arrow src={arrowClosed} onClick={() => setOpen(!open)} />
+				))}
+			{type === "folder" ? (
+				<TypeIcon src={folderIcon} />
+			) : (
+				<TypeIcon src={fileIcon} />
+			)}
+			{editMode ? (
+				<TitleEdit onBlur={rename} defaultValue={name}></TitleEdit>
+			) : (
+				<Title onClick={() => setEditMode(!editMode)}>{name}</Title>
+			)}
 
-				<Delete src={bin} onClick={() => deleteNode(id)} />
-				{open &&
-					children &&
-					renderChildren(children, depth, deleteNode, renameNode)}
-			</NodeElem>
-		</div>
+			<Delete src={bin} onClick={() => deleteNode(id)} />
+			{open &&
+				children.length > 0 &&
+				renderChildren(children, deleteNode, renameNode)}
+		</NodeElem>
 	);
 };
 

@@ -9,6 +9,7 @@ let startNodes = [
 		type: "folder",
 		parent: 0,
 		id: 1,
+		children: [],
 	},
 	{
 		name: "folder2",
@@ -21,12 +22,14 @@ let startNodes = [
 				type: "file",
 				parent: 2,
 				id: 4,
+				children: [],
 			},
 			{
 				name: "file3.txt",
 				type: "file",
 				parent: 2,
 				id: 5,
+				children: [],
 			},
 			{
 				name: "folder3",
@@ -35,16 +38,18 @@ let startNodes = [
 				id: 6,
 				children: [
 					{
-						name: "file4.txt",
-						type: "file",
-						parent: 6,
-						id: 7,
-					},
-					{
 						name: "file5.txt",
 						type: "file",
 						parent: 6,
+						id: 7,
+						children: [],
+					},
+					{
+						name: "file4.txt",
+						type: "file",
+						parent: 6,
 						id: 8,
+						children: [],
 					},
 				],
 			},
@@ -55,11 +60,27 @@ let startNodes = [
 		type: "file",
 		parent: 1,
 		id: 0,
+		children: [],
 	},
 ];
 
+const sortTree = (nodeList) => {
+	nodeList.sort(function (a, b) {
+		sortTree(a.children);
+		if (a.name < b.name) {
+			return -1;
+		}
+		if (a.name > b.name) {
+			return 1;
+		}
+		return 0;
+	});
+	return nodeList;
+};
+
 function App() {
-	const [nodes, setNodes] = useState(startNodes);
+	const [nodes, setNodes] = useState(sortTree(startNodes));
+	const [selectedNodeId, setSelectedNodeId] = useState(null);
 
 	const deleteLoop = (id, nodeList = nodes) => {
 		let newNodes = nodeList.filter((node) => {
@@ -78,20 +99,13 @@ function App() {
 		nodeList.some((node) => {
 			if (node.id === id) {
 				node.name = name;
+				nodeList = sortTree(nodeList);
 				return true;
 			}
-			node.children && renameLoop(id, name, node.children);
+			renameLoop(id, name, node.children);
 		});
 
 		return nodeList;
-	};
-
-	const deleteNode = (id) => {
-		setNodes(deleteLoop(id));
-	};
-
-	const renameNode = (id, name) => {
-		setNodes(renameLoop(id, name));
 	};
 
 	return (
@@ -101,9 +115,10 @@ function App() {
 					<Node
 						key={index}
 						info={node}
-						depth={1}
-						deleteNode={(id) => deleteNode(id)}
-						renameNode={(id, name) => renameNode(id, name)}
+						deleteNode={(id) => setNodes(deleteLoop(id))}
+						renameNode={(id, name) =>
+							setNodes(renameLoop(id, name))
+						}
 					></Node>
 				))}
 			</div>
