@@ -73,8 +73,25 @@ function App() {
 
 		return newNodes;
 	};
+
+	const renameLoop = (id, name, nodeList = nodes) => {
+		nodeList.some((node) => {
+			if (node.id === id) {
+				node.name = name;
+				return true;
+			}
+			node.children && renameLoop(id, name, node.children);
+		});
+
+		return nodeList;
+	};
+
 	const deleteNode = (id) => {
 		setNodes(deleteLoop(id));
+	};
+
+	const renameNode = (id, name) => {
+		setNodes(renameLoop(id, name));
 	};
 
 	return (
@@ -86,6 +103,7 @@ function App() {
 						info={node}
 						depth={1}
 						deleteNode={(id) => deleteNode(id)}
+						renameNode={(id, name) => renameNode(id, name)}
 					></Node>
 				))}
 			</div>
