@@ -22,3 +22,15 @@ id: 4a26c164eb8646333492116ae415dc7b7de04288
 
 
 ![Image of file manager](https://github.com/michael-whelan/file-explorer/blob/master/screen2.png)
+
+
+## Step 3:
+### Added move items in hierarchy
+
+time: ~2hrs
+
+id: ed6d5f2ae7eb6f90a3221b2636218d69d17cbbea
+
+
+![Image of file manager](https://github.com/michael-whelan/file-explorer/blob/master/screen3.png)
+
