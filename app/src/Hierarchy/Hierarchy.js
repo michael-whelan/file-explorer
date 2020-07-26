@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import Node from "./Node";
 import { getFLatNodes } from "./example";
 
-function listToTree(list) {
+const listToTree = (list) => {
 	const map = {},
 		roots = [];
 	let node;
@@ -21,7 +21,7 @@ function listToTree(list) {
 		}
 	}
 	return roots;
-}
+};
 
 const sortTree = (nodeList) => {
 	nodeList.sort(function (a, b) {
@@ -101,9 +101,22 @@ const Hierarchy = () => {
 		return nodeList;
 	};
 
+	const checkValidMove = (toId, moveId, flat) => {
+		let node = flat.filter((elem) => elem.id === toId)[0];
+		if (node.parentId === 0) {
+			return true;
+		} else if (node.parentId === moveId) {
+			return false;
+		}
+		return checkValidMove(node.parentId, moveId, flat);
+	};
+
 	const moveNode = (id) => {
 		if (state.selectedNodeId) {
-			if (state.selectedNodeId !== id) {
+			if (
+				state.selectedNodeId !== id &&
+				checkValidMove(id, state.selectedNodeId, flatten(state.nodes))
+			) {
 				const newNodes = updateNodeAttrib(
 					state.selectedNodeId,
 					"parentId",
@@ -113,7 +126,13 @@ const Hierarchy = () => {
 					nodes: sortTree(listToTree(flatten(newNodes))),
 					selectedNodeId: null,
 				});
+			} else {
+				setState({
+					...state,
+					selectedNodeId: null,
+				});
 			}
+
 			return;
 		}
 		setState({
@@ -129,12 +148,12 @@ const Hierarchy = () => {
 					key={index}
 					info={node}
 					deleteNode={(id) =>
-						setState({ nodes: deleteLoop(id), ...state })
+						setState({ ...state, nodes: deleteLoop(id) })
 					}
 					renameNode={(id, name) =>
 						setState({
-							nodes: sortTree(updateNodeAttrib(id, "name", name)),
 							...state,
+							nodes: sortTree(updateNodeAttrib(id, "name", name)),
 						})
 					}
 					moveNode={(id) => moveNode(id)}
