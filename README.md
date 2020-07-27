@@ -34,3 +34,13 @@ id: ed6d5f2ae7eb6f90a3221b2636218d69d17cbbea
 
 ![Image of file manager](https://github.com/michael-whelan/file-explorer/blob/master/screen3.png)
 
+## Step 4:
+### Add new nodes to hierarchy
+
+time: <1hrs
+
+id: ace53f12aa79509915f3f474288f017cc219378d 
+
+
+![Image of file manager](https://github.com/michael-whelan/file-explorer/blob/master/screen4.png)
+
