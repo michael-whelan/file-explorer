@@ -25,6 +25,8 @@ const listToTree = (list) => {
 
 const sortTree = (nodeList) => {
 	nodeList.sort(function (a, b) {
+		a.type= a.name.includes(".") ? "file" : "folder";
+		b.type= b.name.includes(".") ? "file" : "folder";
 		if (a.type === b.type) {
 			if (a.name < b.name) {
 				return -1;
@@ -64,7 +66,7 @@ function flatten(arr) {
 		: [];
 }
 const startNodes = listToTree(getFLatNodes());
-
+let nextId = 10;
 const Hierarchy = () => {
 	const [state, setState] = useState({
 		selectedNodeId: null,
@@ -81,6 +83,26 @@ const Hierarchy = () => {
 			}
 		});
 		return newNodes;
+	};
+
+	const addNewNode = (parentNode) => {
+		parentNode.children.push({
+			name: "newchild.txt",
+			type: "file",
+			parentId: parentNode.id,
+			id: nextId,
+			children: [],
+		});
+		const newNodes = updateNodeAttrib(
+			parentNode.id,
+			"children",
+			parentNode.children
+		);
+		nextId = nextId + 1;
+		setState({
+			nodes: sortTree(listToTree(flatten(newNodes))),
+			...state,
+		});
 	};
 
 	const updateNodeAttrib = (
@@ -158,6 +180,7 @@ const Hierarchy = () => {
 					}
 					moveNode={(id) => moveNode(id)}
 					selectedNodeId={state.selectedNodeId}
+					addNewNode={(node) => addNewNode(node)}
 				></Node>
 			))}
 		</div>

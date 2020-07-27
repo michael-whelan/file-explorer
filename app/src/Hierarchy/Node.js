@@ -5,6 +5,7 @@ import arrowOpen from "../icons/icon-arrow-down.png";
 import bin from "../icons/bin.png";
 import fileIcon from "../icons/icon-file.png";
 import folderIcon from "../icons/icon-folder.png";
+import addIcon from "../icons/icon-plus.png";
 
 const NodeElem = styled.div`
 	display: block;
@@ -26,6 +27,12 @@ const Arrow = styled.img`
 const Delete = styled.img`
 	position: absolute;
 	width: 20px;
+	margin-left: 1.5vw;
+`;
+
+const Add = styled.img`
+	position: absolute;
+	width: 20px;
 `;
 
 const TypeIcon = styled.img`
@@ -42,6 +49,7 @@ const Title = styled.span`
 const TitleEdit = styled.input`
 	display: inline-block;
 	margin-left: 4vw;
+	max-width:80px;
 `;
 
 const renderChildren = (
@@ -49,7 +57,8 @@ const renderChildren = (
 	deleteNode,
 	renameNode,
 	moveNode,
-	selectedNodeId
+	selectedNodeId,
+	addNewNode
 ) => {
 	return children.map((node, index) => (
 		<Node
@@ -59,20 +68,24 @@ const renderChildren = (
 			renameNode={renameNode}
 			moveNode={moveNode}
 			selectedNodeId={selectedNodeId}
+			addNewNode={addNewNode}
 		></Node>
 	));
 };
 
 const Node = ({
-	info: { name, type, parent, id, children },
+	info,
 	deleteNode,
 	renameNode,
 	moveNode,
 	selectedNodeId,
+	addNewNode,
 }) => {
 	const [open, setOpen] = useState(false);
 	const [editMode, setEditMode] = useState(false);
 
+	const { name, parent, id, children } = info;
+	const type = name.includes(".") ? "file" : "folder";
 	const rename = ({ target: { value } }) => {
 		renameNode(id, value);
 		setEditMode(false);
@@ -87,10 +100,7 @@ const Node = ({
 					<Arrow src={arrowClosed} onClick={() => setOpen(!open)} />
 				))}
 			{type === "folder" ? (
-				<TypeIcon
-					onClick={() => moveNode(id)}
-					src={folderIcon}
-				/>
+				<TypeIcon onClick={() => moveNode(id)} src={folderIcon} />
 			) : (
 				<TypeIcon onClick={() => moveNode(id)} src={fileIcon} />
 			)}
@@ -99,7 +109,7 @@ const Node = ({
 			) : (
 				<Title onClick={() => setEditMode(!editMode)}>{name}</Title>
 			)}
-
+			<Add src={addIcon} onClick={() => addNewNode(info)} />
 			<Delete src={bin} onClick={() => deleteNode(id)} />
 			{open &&
 				children.length > 0 &&
@@ -108,7 +118,8 @@ const Node = ({
 					deleteNode,
 					renameNode,
 					moveNode,
-					selectedNodeId
+					selectedNodeId,
+					addNewNode
 				)}
 		</NodeElem>
 	);
