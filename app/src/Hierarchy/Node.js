@@ -49,7 +49,7 @@ const Title = styled.span`
 const TitleEdit = styled.input`
 	display: inline-block;
 	margin-left: 4vw;
-	max-width:80px;
+	max-width: 80px;
 `;
 
 const renderChildren = (
@@ -58,7 +58,8 @@ const renderChildren = (
 	renameNode,
 	moveNode,
 	selectedNodeId,
-	addNewNode
+	addNewNode,
+	endDrag
 ) => {
 	return children.map((node, index) => (
 		<Node
@@ -69,6 +70,7 @@ const renderChildren = (
 			moveNode={moveNode}
 			selectedNodeId={selectedNodeId}
 			addNewNode={addNewNode}
+			endDrag={endDrag}
 		></Node>
 	));
 };
@@ -80,6 +82,7 @@ const Node = ({
 	moveNode,
 	selectedNodeId,
 	addNewNode,
+	endDrag,
 }) => {
 	const [open, setOpen] = useState(false);
 	const [editMode, setEditMode] = useState(false);
@@ -91,6 +94,11 @@ const Node = ({
 		setEditMode(false);
 	};
 
+	const handleMouseDown = (e) => {
+		moveNode(id, name);
+		e.preventDefault();
+	};
+
 	return (
 		<NodeElem selected={selectedNodeId === id ? true : ""}>
 			{children.length > 0 &&
@@ -100,9 +108,20 @@ const Node = ({
 					<Arrow src={arrowClosed} onClick={() => setOpen(!open)} />
 				))}
 			{type === "folder" ? (
-				<TypeIcon onClick={() => moveNode(id)} src={folderIcon} />
+				<TypeIcon
+					onMouseUp={() => {
+						console.log("node");
+						moveNode(id, name);
+					}}
+					onMouseDown={handleMouseDown}
+					src={folderIcon}
+				/>
 			) : (
-				<TypeIcon onClick={() => moveNode(id)} src={fileIcon} />
+				<TypeIcon
+					onMouseUp={() => endDrag()}
+					onMouseDown={handleMouseDown}
+					src={fileIcon}
+				/>
 			)}
 			{editMode ? (
 				<TitleEdit onBlur={rename} defaultValue={name}></TitleEdit>
@@ -119,7 +138,8 @@ const Node = ({
 					renameNode,
 					moveNode,
 					selectedNodeId,
-					addNewNode
+					addNewNode,
+					endDrag
 				)}
 		</NodeElem>
 	);

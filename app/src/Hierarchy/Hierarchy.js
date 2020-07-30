@@ -1,6 +1,7 @@
-import React, { useEffect, useState } from "react";
+import React, { useState, useLayoutEffect } from "react";
 import Node from "./Node";
 import { getFLatNodes } from "./example";
+import Draggable from "./Draggable";
 
 const listToTree = (list) => {
 	const map = {},
@@ -25,8 +26,8 @@ const listToTree = (list) => {
 
 const sortTree = (nodeList) => {
 	nodeList.sort(function (a, b) {
-		a.type= a.name.includes(".") ? "file" : "folder";
-		b.type= b.name.includes(".") ? "file" : "folder";
+		a.type = a.name.includes(".") ? "file" : "folder";
+		b.type = b.name.includes(".") ? "file" : "folder";
 		if (a.type === b.type) {
 			if (a.name < b.name) {
 				return -1;
@@ -66,12 +67,21 @@ function flatten(arr) {
 		: [];
 }
 const startNodes = listToTree(getFLatNodes());
+
 let nextId = 10;
 const Hierarchy = () => {
 	const [state, setState] = useState({
 		selectedNodeId: null,
 		nodes: sortTree(startNodes),
 	});
+
+	const [dragNode, setDragNode] = useState({ drag: false, name: null });
+
+	useLayoutEffect(() => {
+		document.addEventListener("mouseup", (e) => {
+			setDragNode({ drag: false, name: null });
+		});
+	}, []);
 
 	const deleteLoop = (id, nodeList = state.nodes) => {
 		let newNodes = nodeList.filter((node) => {
@@ -133,7 +143,8 @@ const Hierarchy = () => {
 		return checkValidMove(node.parentId, moveId, flat);
 	};
 
-	const moveNode = (id) => {
+	const moveNode = (id, name) => {
+		setDragNode({ drag: !dragNode.drag, name: name });
 		if (state.selectedNodeId) {
 			if (
 				state.selectedNodeId !== id &&
@@ -154,7 +165,7 @@ const Hierarchy = () => {
 					selectedNodeId: null,
 				});
 			}
-
+			console.log("newNode")
 			return;
 		}
 		setState({
@@ -178,11 +189,13 @@ const Hierarchy = () => {
 							nodes: sortTree(updateNodeAttrib(id, "name", name)),
 						})
 					}
-					moveNode={(id) => moveNode(id)}
+					moveNode={(id, name) => moveNode(id, name)}
 					selectedNodeId={state.selectedNodeId}
 					addNewNode={(node) => addNewNode(node)}
+					endDrag={() => setDragNode({ drag: false, name: null })}
 				></Node>
 			))}
+			{dragNode.drag && <Draggable name={dragNode.name} />}
 		</div>
 	);
 };
